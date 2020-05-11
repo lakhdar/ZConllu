@@ -8,7 +8,7 @@ dependency parsing of CoNLL-U files.
  
 ### Requirements and Installation
 
-### First Clone this repo
+### Clone this repo
 
 ```
 git clone https://github.com/lakhdar/ZConllu.git
@@ -17,5 +17,9 @@ npm install
 
 npm run start 
 ```
-### Or download from release here
+### Download from release here
 [release](https://github.com/lakhdar/ZConllu/releases) 
+
+![alt shot1](https://github.com/lakhdar/ZConllu/blob/master/img/sht1.PNG)
+
+![alt shot2](https://github.com/lakhdar/ZConllu/blob/master/img/sht2.PNG)
