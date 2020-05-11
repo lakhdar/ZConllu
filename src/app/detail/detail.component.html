@@ -1,0 +1,90 @@
+ <div class="main-panel ps ps--active-y" data="blue">
+  <app-nav>
+       <a class="navbar-brand " href="javascript:void(0)" slot="title" >{{langname}}<b> / </b>{{filename}} </a>
+       <a class=" btn btn-primary" href="javascript:void(0)" slot="tools" [routerLink]="['/home']">Back to files</a>
+       <a class=" btn btn-success" href="javascript:void(0)" slot="tools" (click)="addSentence()">Add a sentence </a>
+  </app-nav>
+    
+ <div class="content">
+  <app-alert [message]="errorMsg"></app-alert>
+   <div class="row">
+     
+     <div class="col-md-12" *ngIf="file">
+      <app-sent-panel  *ngFor="let sent of file.sentences" [sent]="sent"     [langName]="langname" [fileName]="filename" [currentPage]="currentPage"
+       (deleteSent)="deletesent(sent)"
+       (editSent)="editSentece(sent)"
+        >
+      </app-sent-panel>
+     </div>
+     <div class="col-md-12" *ngIf="!file.sentences.length">
+          This file is empty
+      </div>
+   </div>
+   <div class="row" *ngIf="pages.length">
+     <div class="col-sm-12 col-md-5">
+       <div class="dataTables_info" id="datatable_info" role="status" aria-live="polite">Showing {{current}} to {{last}} of {{totalsentences}} sentences </div>
+      </div>
+      <div class="col-sm-12 col-md-7" data="blue">
+        <div class="dataTables_paginate paging_full_numbers" id="datatable_paginate">
+          <ul class="pagination" data>
+            <li class="paginate_button page-item first " [ngClass]="{'disabled': 1>=currentPage}"  id="datatable_first">
+            <button  tabindex="0" class="page-link" (click)="gotoPage(1)" >First</button>
+          </li>
+          <li class="paginate_button page-item previous " [ngClass]="{'disabled': 1>=currentPage}" id="datatable_previous">
+            <button  tabindex="0" class="page-link" (click)="gotoPage((currentPage/1-1))" >Previous</button>
+          </li>
+
+          <li class="paginate_button page-item "   [ngClass]="{'active': pg==currentPage}" *ngFor="let pg of pages">
+            <button  tabindex="{{pg}}" class="page-link" *ngIf="pg/1" data="blue" (click)="gotoPage(pg)">{{pg}}</button>
+            <i class="page-link" *ngIf="!(pg/1)">{{pg}}</i>
+          </li>
+          
+          <li class="paginate_button page-item next" id="datatable_next" [ngClass]="{'disabled': currentPage>=lastPage}">
+            <button   class="page-link" (click)="gotoPage((currentPage/1+1))" >Next</button>
+          </li>
+          <li class="paginate_button page-item last" id="datatable_last" [ngClass]="{'disabled': currentPage>=lastPage}">
+            <button class="page-link" (click)="gotoPage(lastPage)" >Last</button>
+          </ul>
+        </div>
+      </div>
+    </div>
+ </div>
+ <app-modal-popup *ngIf="showSentenceDeleteDialog"  (close)="cancelDeleteSentence()" (save)="confirmDeleteSentence()">
+  <span slot="title">Confirm delete</span>
+  <div slot="body">
+    <p>Please confirm deletion of {{currentSentence.sentId}}</p>
+    <span class="fa fa-spinner fa-spin fa-3x" *ngIf="showSpinner"></span>
+  </div>
+</app-modal-popup>
+<app-modal-popup *ngIf="showEditSenteceDialog"  (close)="cancelEditSentece()" (save)="confirmEditSentece()">
+  <span slot="title">Edit sentence</span>
+  <div slot="body">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <label class="col-sm-3 col-form-label">Sent id *</label>
+          <div class="col-sm-9">
+            <div class="form-group">
+              <input class="form-control" type="text" name="sentId"   required="" [(ngModel)]="currentSentence.sentId">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="col-sm-2 col-form-label">Text *</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <textarea class="form-control" [(ngModel)]="currentSentence.text" rows="5" cols="60"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <label id="email-error" class="error" for="langName" *ngIf="errorMsg" style="color: red;" (click)="errorMsg=''">{{errorMsg}}</label>
+        <span class="fa fa-spinner fa-spin fa-3x" *ngIf="showSpinner"></span>
+     </div>
+    </div>
+
+  </div>
+</app-modal-popup>
+ <app-footer></app-footer>
+</div> 

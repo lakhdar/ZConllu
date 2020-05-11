@@ -1,0 +1,263 @@
+
+ <div class="card card-tasks text-left" style="height: auto;">
+  <div class="card-header " style="background:#2121214a;" >
+    <i class="tim-icons icon-vector" title="Can automaticaly parse text to UD" *ngIf="language.udpeFile"></i>
+    <h6 class="title d-inline" title="click to edit" style="cursor: pointer;" *ngIf="!language.isPrestine" (click)="toggleEditInput()">
+      {{languageName}}
+    </h6>
+    <div class="row" *ngIf="language.isPrestine" style="display: inline-block;">
+      <div class="col-md-2 form-group" [ngClass]="{'has-danger': !!errorMsg}">
+        <input type="text" #input1 name="langName" class="form-control" style="text-transform: uppercase;"
+        [(ngModel)]="languageName"  maxlength="2" max="3" size="3" style="width: 100px;"
+        (focusout)="toggleEditInput()"
+        (change)="renamelanguage()"/>
+      </div>
+    </div>
+      <label id="email-error" class="error" for="langName" *ngIf="errorMsg" style="color: red;" (click)="errorMsg=''">{{errorMsg}}</label>
+      <span class="fa fa-spinner fa-spin fa-2x" *ngIf="showSpinner"></span>
+    <!-- <p class="card-category d-inline "><span class="badge badge-info">sents:  {{totalsents}} </span></p>
+    <p class="card-category d-inline"><span class="badge badge-danger">sents: {{totalsents}}</span></p>
+    <p class="card-category d-inline"><span class="badge badge-success">Words:  {{totalWords}} </span></p> -->
+    <div class="pull-right" style="display: inline-block; line-height: 45px;">
+      <div class="dropdown " [ngClass]="{'show':toggleMenu}">
+        <button type="button" class="btn btn-link dropdown-toggle btn-icon" data-toggle="dropdown" [attr.aria-expanded]="toggleMenu" (click)="toggleMenu=!toggleMenu">
+          <i class="tim-icons icon-settings-gear-63"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right show" *ngIf='toggleMenu'  x-placement="top-end" style="position: absolute; transform: translate3d(-122px, -186px, 0px) ; top: 0px ; left: 0px ; will-change: transform;" x-out-of-boundaries="">
+          <button class="dropdown-item"  (click)="importUdpefile()" >
+            <i class="fa fa-upload"  ></i> Import udpipe file
+          </button>
+          <button class="dropdown-item"  (click)="importfile()" >
+            <i class="fa fa-upload"  ></i> Import conllu file
+          </button>
+          <button class="dropdown-item"  (click)="createFile()" >
+            <i class="fa fa-plus"  ></i> Create new file
+          </button>
+          <button class="dropdown-item text-danger" href="#" (click)="OndeleteLanguage()" title="Delete this language">
+            <i class="fa fa-trash"  ></i> Delete this language
+          </button>
+          <hr/>
+          <button class="dropdown-item"  (click)="train()" >
+            <i class="tim-icons icon-molecule-40"  ></i> Train auto-tagger
+          </button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-link  btn-icon show"  (click)="language.isExpanded=!language.isExpanded">
+        <i class="fa"  [ngClass]="{'fa-chevron-up':!language.isExpanded,'fa-chevron-down':!!language.isExpanded}"></i>
+      </button>
+  </div>
+  </div>
+  <div class="card-body" *ngIf='language.isExpanded'>
+    <div class="card " *ngIf="language.conlluFiles.length">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive ps">
+              <table class="table">
+                <thead class=" text-primary">
+                  <tr role="row" class="tablesorter-headerRow">
+                    <th data-column="0" class="tablesorter-header tablesorter-headerUnSorted"   style="user-select: none;">
+                      <div class="tablesorter-header-inner">
+                      File name
+                    </div>
+                    <th class="text-right">
+                      <div class="tablesorter-header-inner">
+                      Sentences
+                    </div>
+                  </th>
+                    <th class="text-right">
+                      <div class="tablesorter-header-inner">
+                      Words
+                    </div>
+                  </th>
+                    <th class="text-right"  >
+                      <div class="tablesorter-header-inner">
+                      Lemmas
+                    </div>
+                  </th>
+                  <th></th>
+                  </thead>
+                <tbody>
+                  <tr *ngFor="let fl of language.conlluFiles">
+                    <td>
+                      <div >
+                        {{fl.fileName}}
+                      </div>
+                    </td>
+                    <td class="text-right">
+                      {{fl.totalsents}} 
+                    </td>
+                    <td class="text-right">
+                      {{fl.totalWords}} 
+                    </td>
+                    <td class="text-right">
+                      {{fl.totalLemmas}} 
+                    </td>
+                    <td>
+                      <div >
+                        <div class="dropdown pull-right" >
+                          <button type="button" class="btn btn-link  btn-icon" [routerLink]="['/detail',language.languageName,fl.fileName,1]" routerLinkActive="router-link-active"   title="details">
+                            <i class="fa fa-pencil"  ></i>
+                          </button>
+                          <button type="button" class="btn btn-link  btn-icon"   title="delete this file" (click)="deletefile(fl)">
+                            <i class="fa fa-trash"  ></i>
+                          </button>
+                          <button type="button" class="btn btn-link  btn-icon"  title="Move this file to an other language" (click)="moveFile(fl)" >
+                            <i class="fa fa-copy"  ></i>
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <app-modal-popup *ngIf="showDeleteFileDialog"  (close)="cancelDeletefile()" (save)="confirmDeletefile()">
+        <span slot="title">Confirm File delete</span>
+        <div slot="body">
+          <p>Please confirm file delete {{currentFile.fileName}}</p>
+        </div>
+      </app-modal-popup>
+
+      <app-modal-popup *ngIf="showMoveFileDialog"  (close)="cancelMoveFile()" (save)="confirmMovefile()">
+        <span slot="title">Select Language</span>
+        <div slot="body">
+          <div class="card">
+            <div class="card-body">
+              <div class="form-group" [ngClass]="{'has-danger': !!errorMsg}">
+                <select name="selectedQuantity" id="aantal" class="form-control custom-select" [(ngModel)]="selectedLanguageName" >
+                  <option *ngFor="let option of otherlanguages" [value]="option.languageName" >{{option.languageName}}</option>
+                </select>
+                <label id="email-error" class="error" for="langName" *ngIf="errorMsg">{{errorMsg}}</label>
+              </div>
+        </div>
+      </div>
+    </div>
+      </app-modal-popup>
+
+
+        <app-modal-popup *ngIf="showCreateFileDialog"  (close)="cancelCreateFile()" (save)="confirmCreatefile()">
+          <span slot="title">New file</span>
+          <div slot="body">
+            <div class="card">
+              <div class="card-body">
+                  <div class="row">
+                    <label class="col-sm-3 col-form-label">File name *</label>
+                    <div class="col-sm-9">
+                      <div class="form-group" [ngClass]="{'has-danger': !!errorMsg}">
+                        <input class="form-control" type="text" name="index"  required=""  [(ngModel)]="currentFile.fileName">
+                        <label id="email-error" class="error" for="langName" *ngIf="errorMsg">{{errorMsg}}</label>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+      </app-modal-popup>
+
+
+      <app-modal-popup *ngIf="showTrainDialog"  (close)="cancelTrainFile()" (save)="confirmTrainfile()">
+        <span slot="title">New file</span>
+        <div slot="body">
+          <div class="card" >
+            <div class="card-body">
+                <div class="row">
+                  <label class="col-sm-3 col-form-label">Train file *</label>
+                  <div class="col-sm-9">
+                    <div class="form-group" >
+                      <select class="form-control custom-select"   [(ngModel)]="trainModel.currentTrainFileName" >
+                        <option *ngFor="let option of trainModel.files" [value]="option.fileName" >{{option.fileName}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="col-sm-3 col-form-label">Test file *</label>
+                  <div class="col-sm-9">
+                    <div class="form-group" >
+                      <select class="form-control custom-select"   [(ngModel)]="trainModel.currentDevFileName" >
+                        <option *ngFor="let option of trainModel.files" [value]="option.fileName" >{{option.fileName}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-sm-3">
+                      <label class="col-form-label">Epochs *</label>
+                      <div class="form-group" >
+                        <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.epochs">
+                      </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="col-form-label">Dropout *</label>
+                    <div class="form-group" >
+                      <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.dropout">
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="col-form-label">Batch size *</label>
+                    <div class="form-group" >
+                      <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.batch_size">
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="col-form-label">Dimension *</label>
+                    <div class="form-group" >
+                      <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.dimension">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-3">
+                      <label class="col-form-label">Learning rate *</label>
+                      <div class="form-group" >
+                        <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.learning_rate">
+                      </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="col-form-label">Early stopping *</label>
+                    <div class="form-group" >
+                      <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.early_stopping">
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="col-form-label">Initialization range *</label>
+                    <div class="form-group" >
+                      <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.initialization_range">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-3">
+                      <label class="col-form-label">Tagger iterations *</label>
+                      <div class="form-group" >
+                        <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.taggerIterations">
+                      </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="col-form-label">Parser iterations *</label>
+                    <div class="form-group" >
+                      <input class="form-control" type="number" name="index"  required=""  [(ngModel)]="trainModel.parserIterations">
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div [ngClass]="{'has-danger': !!errorMsg}" style="text-align: center; ">
+                   <label  class="error" for="" *ngIf="errorMsg" style="color:red">{{errorMsg}}</label>
+            </div>
+          </div>
+        </div>
+    </app-modal-popup>
+
+
+
+
+</div>
+

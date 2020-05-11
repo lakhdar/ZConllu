@@ -1,0 +1,40 @@
+    <div class="main-panel " data="blue">
+      
+       <app-nav>
+            <a class="navbar-brand " href="javascript:void(0)" slot="title" >Languages UD  </a>
+            <a class=" btn btn-success" href="javascript:void(0)" slot="tools" (click)="addLanguage()">Add language </a>
+       </app-nav>
+         
+      <!-- End Navbar -->
+      <div class="content">
+        <div class="row">
+          <app-alert [message]="errorMsg"></app-alert>
+          <div class="col-md-12" *ngIf="languages.length">
+           <app-language-panel  *ngFor="let lang of languages" [language]="lang"    (deleteLanguage)="deleteLanguage(lang)"   [languages]="languages">
+           </app-language-panel>
+          </div>
+          <div class="col-md-12" *ngIf="!languages.length">
+            <div class="alert alert-info">
+              There is no files 
+            </div>
+              
+           </div>
+        </div>
+      </div>
+      <!--  -->
+      <app-footer></app-footer>
+     
+      <app-spinner *ngIf="showPinner">
+
+      </app-spinner>
+
+      <app-modal-popup *ngIf="showLanguageDeleteDialog"  (close)="cancelDeleteLanguage()" (save)="confirmDeleteLanguage()">
+        <span slot="title">Confirm delete</span>
+        <div slot="body">
+         <p>Please confirm deletion of {{currentLanguage.languageName}}</p>
+        </div>
+      </app-modal-popup>
+
+    </div>
+
+    

@@ -1,0 +1,39 @@
+
+@import "main";
+ 
+$colors: (
+  primary:    #424242,
+  secondary:  #fcd736,
+  danger:     #f53d3d,
+  light:      #f4f4f4,
+  accent:     #202020,
+  dark:       #222222,
+  favorite:   #69BB7B,
+  // Button Twitter
+  twitter:(
+    base: #64B5F6,
+    contrast: #fff
+  ),
+  // Button Facebook
+  facebook:(
+    base: #3949ab,
+    contrast: #fff
+  ),
+  // Button Google
+  google:(
+    base: #bf360c,
+    contrast: #fff
+  ),
+  // Button Pinterest
+  pinterest:(
+    base: #ff3d00,
+    contrast: #fff
+  ),
+);
+
+
+ 
+
+
+
+ 

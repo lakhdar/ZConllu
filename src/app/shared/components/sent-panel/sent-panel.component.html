@@ -1,0 +1,279 @@
+
+ <div class="card card-tasks text-left" style="height: auto;">
+  <div class="card-header" style="background:#2121214a;" title="sent_id={{sent.sentId}}">
+    <h6 class="title d-inline">{{sent.text}}</h6>
+    <div class="dropdown">
+      <button type="button" class="btn btn-link  btn-icon"  (click)="OnSentDeleting()" title="delete this Sentence">
+        <i class="fa fa-trash"  ></i>
+      </button>
+     
+      <button type="button" class="btn btn-link  btn-icon"  title="Edit this sentence" (click)="OnEditSentence()"> 
+        <i class="fa fa-pencil"  ></i>
+      </button>
+      <button type="button" rel="tooltip" class="btn btn-success btn-link btn-sm btn-icon " data-original-title="Refresh" title="Add new line" (click)="addLine()" >
+        <i class="tim-icons icon-simple-add"></i>
+      </button>
+      <button type="button" class="btn btn-link  btn-icon"  (click)="sent.isExpnaded=!sent.isExpnaded" title="Expande/collapse">
+        <i class="fa"  [ngClass]="{'fa-chevron-up':!sent.isExpnaded,'fa-chevron-down':!!sent.isExpnaded}"></i>
+      </button>
+    </div>
+    <label id="email-error" class="error" for="langName" *ngIf="errorMsg" style="color: red;" (click)="errorMsg=''">{{errorMsg}}</label>
+  </div>
+  <div class="card-body" *ngIf='sent.isExpnaded'>
+       
+
+    <div class="table-responsive ps">
+      <table class="table tablesorter tablesorter-default tablesorterb9bc7fd56cde" id="simple-table" role="grid">
+        <thead class=" text-primary">
+          <tr role="row" class="tablesorter-headerRow">
+            <th data-column="0" class="tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" aria-controls="simple-table" unselectable="on" aria-sort="none" aria-label="Name: No sort applied, activate to apply an ascending sort" style="user-select: none;">
+                      <div class="tablesorter-header-inner">
+                      Index
+                    </div>
+                    <th data-column="0" class="text-left"   style="user-select: none;">
+                      <div class="tablesorter-header-inner">
+                      FORM
+                    </div>
+                  </th>
+                    <th data-column="1" class="text-left"    style="user-select: none;">
+                      <div class="tablesorter-header-inner">
+                      LEMMA
+                    </div>
+                  </th>
+                    <th data-column="2" class="text-left"   style="user-select: none;">
+                      <div class="tablesorter-header-inner">
+                      POS
+                    </div>
+                    </th>
+                      <th class="text-left tablesorter-header tablesorter-headerUnSorted" style="user-select: none;">
+                        <div class="tablesorter-header-inner">
+                          XPOS
+                      </div>
+                    </th>
+                    <th class="text-left tablesorter-header tablesorter-headerUnSorted" style="user-select: none;">
+                      <div class="tablesorter-header-inner">
+                        FEATS
+                    </div>
+                  </th>
+                  <th class="text-right tablesorter-header tablesorter-headerUnSorted" style="user-select: none;">
+                    <div class="tablesorter-header-inner">
+                      HEAD
+                  </div>
+                </th>
+                <th class="text-center tablesorter-header tablesorter-headerUnSorted" style="user-select: none;">
+                  <div class="tablesorter-header-inner">
+                    DEPREL
+                </div>
+              </th>
+              <th class="text-center tablesorter-header tablesorter-headerUnSorted" style="user-select: none;">
+                <div class="tablesorter-header-inner">
+                  DEPS
+              </div>
+            </th>
+            <th class="text-left tablesorter-header tablesorter-headerUnSorted" style="user-select: none;">
+              <div class="tablesorter-header-inner">
+                MISC
+            </div>
+          </th>
+          <th></th>
+          </tr>
+        </thead>
+        <tbody aria-live="polite" aria-relevant="all">
+          <tr role="row" *ngFor="let line of sent.lines">
+            <td>
+              {{line.index}}
+            </td>
+            <td class="text-left ellipsis" style="max-width: 100px;;" title="{{line.word}}">
+              {{line.word}}
+            </td>
+            <td class="text-left ellipsis" style="max-width: 100px;;" title="{{line.lemma}}">
+              {{line.lemma}}
+            </td>
+            <td class="text-left ellipsis" style="max-width: 100px;;" title="{{line.POS}}">
+              {{line.POS}}
+            </td>
+            <td class="text-left ellipsis" style="max-width: 100px;;" title="{{line.XPOS}}">
+              {{line.XPOS}}
+            </td>
+            <td class="text-left ellipsis" style="max-width: 100px;;" title="{{line.FEATS}}">
+              {{line.FEATS}}
+            </td>
+            <td class="text-right  ellipsis" style="max-width: 100px;;" title="{{line.HEAD}}">
+              {{line.HEAD}}
+            </td>
+            <td class="text-center  ellipsis" style="max-width: 100px;;" title="{{line.DEPREL}}">
+              {{line.DEPREL}}
+            </td>
+            <td class="text-center">
+              {{line.DEPS}}
+            </td>
+            <td class="text-left  ellipsis" style="max-width: 120px;;" title="{{line.MISC}}">
+              {{line.MISC}}
+            </td>
+            
+            <td>
+              <div class="dropdown pull-right" >
+                <button type="button" class="btn btn-link  btn-icon"  title="Edit this line" (click)="editLine(line)">
+                  <i class="fa fa-pencil"  ></i>
+                </button>
+                <button type="button" class="btn btn-link  btn-icon"  (click)="deleteLine(line)" title="delete this file">
+                  <i class="fa fa-trash"  ></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+</div>
+
+<app-modal-popup *ngIf="showLineDeleteDialog"  (close)="cancelLineDelete()" (save)="confirmLineDelete()">
+  <span slot="title">Confirm delete</span>
+  <div slot="body">
+   <p>Please confirm delete line {{currentLine.index}}</p>
+  </div>
+</app-modal-popup>
+
+
+
+<app-modal-popup *ngIf="showEditLineDialog"  (close)="cancelEditLine()" (save)="confirmEditLine()">
+  <span slot="title">{{bForAdd?'Add a new ':'Edit ' }} Line</span>
+  <div slot="body">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <label class="col-sm-2 col-form-label">ID *</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <input class="form-control" type="text" name="index"  required=""  [(ngModel)]="currentLine.index">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="col-sm-2 col-form-label">FORM *</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <input class="form-control" type="text" name="word"  required="" [(ngModel)]="currentLine.word">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-sm-2 col-form-label">LEMMA *</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <input class="form-control" type="text" name="lemma"  required="" [(ngModel)]="currentLine.lemma">
+            </div>
+          </div>
+        </div>
+
+
+        <div class="row">
+          <label class="col-sm-2 col-form-label">UPOS *</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <select class="form-control custom-select" type="text" name="POS"  [(ngModel)]="currentLine.POS"  >
+                <option *ngFor="let option of UPOS" [value]="option.name" >{{option.value}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-sm-2 col-form-label">XPOS</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <input class="form-control" type="text" name="XPOS"   required="" [(ngModel)]="currentLine.XPOS">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-sm-2 col-form-label">FEATS</label>
+          <div class="col-sm-10">
+            <!-- <div class="input-group">
+              <input class="form-control" type="text" name="FEATS" readonly  [(ngModel)]="currentLine.FEATS">
+              <div class="input-group-append">
+                <span class="input-group-text">@</span>
+              </div>
+            </div> -->
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text" style="padding:7px!important;padding-right:10px;">
+                  <i class="tim-icons icon-pencil" style="cursor: pointer;" (click)="currentLine.isExpanded=!currentLine.isExpanded"></i>
+                </div>
+              </div>
+              <input type="text" name="FEATS" class="form-control" readonly  [(ngModel)]="currentLine.FEATS">
+              
+            </div>
+          </div>
+           
+        </div>
+        <div class="row" *ngIf="currentLine.isExpanded" >
+          <div class="card">
+            <div class="card-header dropdown " [ngClass]="{'show':currentLine.isFEATExpanded}" style="padding:0;padding-right: 12px;">
+              <i class="fa fa-cog pull-right  text-warning"  
+                 [ngClass]="{'loading-spinner': !currentLine.isFEATExpanded}"
+                (click)="currentLine.isFEATExpanded=!currentLine.isFEATExpanded" 
+                title="Add/Remove FEATS"
+                style="cursor: pointer;"></i>
+              <div class="dropdown-menu dropdown-menu-right show" *ngIf='currentLine.isFEATExpanded'  x-placement="top-end" style="position: absolute; transform: translate3d(-122px, -186px, 0px) ; top: 0px ; left: 0px ; will-change: transform;max-height:350px;overflow: auto;" x-out-of-boundaries="">
+                <button class="dropdown-item" title="{{ft.checked?'Remove ':'Add '}} this FEAT"   *ngFor="let ft of allFEATS" (click)="addOrRemoveFeat(ft)">
+                  <i class="fa text-success" [ngClass]="{'fa-check': ft.checked,'fa-plus': !ft.checked}" ></i> 
+                   <b>{{ft.name}}</b>:  {{ft.value}}
+                </button>
+              </div>
+            </div>
+            <div class="card-body row">
+              
+              <div class="col-sm-4" *ngFor="let item of _FEATS" >
+                <label >{{item.name}}</label>
+                <div class="form-group">
+                  <select class="form-control custom-select" title="{{item.value}} {{item.description}}"  [(ngModel)]="item.value" (change)="updateFeats()">
+                    <option *ngFor="let option of item.items" [value]="option.name" >{{option.value}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+         </div>
+        <div class="row">
+          <label class="col-sm-2 col-form-label">HEAD</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <input class="form-control" type="text" name="HEAD"   required="" [(ngModel)]="currentLine.HEAD">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-sm-2 col-form-label">DEPREL</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <select class="form-control custom-select" type="text" name="DEPREL"  [(ngModel)]="currentLine.DEPREL" >
+                <option *ngFor="let option of DEPREL" [value]="option.name" >{{option.value}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-sm-2 col-form-label">DEPS</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <input class="form-control" type="text" name="DEPS"   required="" [(ngModel)]="currentLine.DEPS">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-sm-2 col-form-label">MISC</label>
+          <div class="col-sm-10">
+            <div class="form-group">
+              <input class="form-control" type="text" name="MISC"   required="" [(ngModel)]="currentLine.MISC">
+            </div>
+          </div>
+        </div>
+        <label id="email-error" class="error" for="langName" *ngIf="errorMsg" style="color: red;" (click)="errorMsg=''">{{errorMsg}}</label>
+      </div>
+    </div>
+  </div>
+</app-modal-popup>
+
+</div>
+

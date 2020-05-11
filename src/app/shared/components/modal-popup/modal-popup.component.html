@@ -1,0 +1,21 @@
+<div class="modal fade show"  id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: block;">
+  <div class="modal-dialog " role="document" style="transform: translateY(5%) !important;" >
+    <div class="modal-content" style="display: block;min-width:670px">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          <ng-content select="[slot=title]"></ng-content>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onclose()" >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" >
+        <ng-content select="[slot=body]"></ng-content>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onclose()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onsave()" >OK</button>
+      </div>
+    </div>
+  </div>
+</div>
