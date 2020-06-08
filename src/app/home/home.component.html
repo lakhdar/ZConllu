@@ -1,7 +1,8 @@
     <div class="main-panel " data="blue">
       
        <app-nav>
-            <a class="navbar-brand " href="javascript:void(0)" slot="title" >Languages UD  </a>
+            <a class="navbar-brand " href="javascript:void(0)" slot="title" >
+              <i class="tim-icons icon-vector fa-spin" title="Actually training" *ngIf="isTraining"></i> Languages UD  </a>
             <a class=" btn btn-success" href="javascript:void(0)" slot="tools" (click)="addLanguage()">Add language </a>
        </app-nav>
          
@@ -10,14 +11,14 @@
         <div class="row">
           <app-alert [message]="errorMsg"></app-alert>
           <div class="col-md-12" *ngIf="languages.length">
-           <app-language-panel  *ngFor="let lang of languages" [language]="lang"    (deleteLanguage)="deleteLanguage(lang)"   [languages]="languages">
+           <app-language-panel  *ngFor="let lang of languages"  [isTraining]="isTraining" [language]="lang"  (updateLanguage)="updateLanguage(lang)"    (deleteLanguage)="deleteLanguage(lang)"   [languages]="languages">
            </app-language-panel>
           </div>
           <div class="col-md-12" *ngIf="!languages.length">
             <div class="alert alert-info">
               There is no files 
             </div>
-              
+               
            </div>
         </div>
       </div>
@@ -34,6 +35,47 @@
          <p>Please confirm deletion of {{currentLanguage.languageName}}</p>
         </div>
       </app-modal-popup>
+
+      <app-modal-popup *ngIf="showCreateLanguageDialog"  (close)="cancelCreateLanguage()" (save)="confirmCreateLanguage()">
+        <span slot="title">{{isForUpdate?'Update':'New'}} language</span>
+        <div slot="body">
+          <div class="card">
+            <div class="card-body">
+                <div class="row">
+                  <label class="col-sm-3 col-form-label">language name *</label>
+                  <div class="col-sm-9">
+                    <div class="form-group" [ngClass]="{'has-danger': !!errorMsg}">
+                      <input class="form-control" type="text" name="originalName"  required=""  [(ngModel)]="currentLanguage.originalName">
+                      <label id="email-error" class="error" for="langName" *ngIf="errorMsg">{{errorMsg}}</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <label class="col-sm-3 col-form-label">ISO two letters name </label>
+                  <div class="col-sm-9">
+                    <div class="form-group" [ngClass]="{'has-danger': !!errorMsg}">
+                      <input class="form-control" type="text" maxlength="2" max="2" name="languageTwoLetters"  (attr.readonly)="!isForUpdate" required=""  [(ngModel)]="currentLanguage.languageTwoLetters" style="text-transform: uppercase;">
+                      <label id="email-error" class="error" for="languageTwoLetters" *ngIf="errorMsg">{{errorMsg}}</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <label class="col-sm-3 col-form-label">English name *</label>
+                  <div class="col-sm-9">
+                    <div class="form-group" [ngClass]="{'has-danger': !!errorMsg}">
+                      <input class="form-control" type="text" name="languageName"  required=""  [(ngModel)]="currentLanguage.languageName">
+                      <label id="email-error" class="error" for="languageName" *ngIf="errorMsg">{{errorMsg}}</label>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+          </div>
+        </div>
+    </app-modal-popup>
+
 
     </div>
 

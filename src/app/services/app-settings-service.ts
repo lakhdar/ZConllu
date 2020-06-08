@@ -10,6 +10,7 @@ export class AppSettingsService {
   jsonDBPath="conllus.json";
   pageName="P_";
   pageSize=10;
+  
   constructor() {}
 
   UPOS=[
@@ -30,6 +31,7 @@ export class AppSettingsService {
     {name:"SYM",value: "symbol"},
     {name:"VERB",value: "verb"},
     {name:"X",value: "other"},
+    {name:"_",value: "_"},
   ]
   DEPREL=[
     {name:"acl",value: "clausal modifier of noun (adjectival clause)"},
@@ -69,6 +71,7 @@ export class AppSettingsService {
     {name:"root",value: "root"},
     {name:"vocative",value: "vocative"},
     {name:"xcomp",value: "open clausal complement"},
+    {name:"_",value: "_"},
   ];
 
   FEATS=[
@@ -429,9 +432,6 @@ export class AppSettingsService {
       {name:"Dash",value: "dash, hyphen",description:"_"},
       {name:"Symb",value: "symbol",description:"determiner or adverb (nobody, nothing, none)"}
     ]},
-
-
-
 
     {name:"Reflex",value: "reflexive",
     items:[

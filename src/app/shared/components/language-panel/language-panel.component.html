@@ -2,17 +2,17 @@
  <div class="card card-tasks text-left" style="height: auto;">
   <div class="card-header " style="background:#2121214a;" >
     <i class="tim-icons icon-vector" title="Can automaticaly parse text to UD" *ngIf="language.udpeFile"></i>
-    <h6 class="title d-inline" title="click to edit" style="cursor: pointer;" *ngIf="!language.isPrestine" (click)="toggleEditInput()">
+    <h6 class="title d-inline" title="click to edit" style="cursor: pointer;"   (click)="OnUpdateLanguage()">
       {{languageName}}
     </h6>
-    <div class="row" *ngIf="language.isPrestine" style="display: inline-block;">
+    <!-- <div class="row" *ngIf="language.isPrestine" style="display: inline-block;">
       <div class="col-md-2 form-group" [ngClass]="{'has-danger': !!errorMsg}">
         <input type="text" #input1 name="langName" class="form-control" style="text-transform: uppercase;"
         [(ngModel)]="languageName"  maxlength="2" max="3" size="3" style="width: 100px;"
         (focusout)="toggleEditInput()"
         (change)="renamelanguage()"/>
       </div>
-    </div>
+    </div> -->
       <label id="email-error" class="error" for="langName" *ngIf="errorMsg" style="color: red;" (click)="errorMsg=''">{{errorMsg}}</label>
       <span class="fa fa-spinner fa-spin fa-2x" *ngIf="showSpinner"></span>
     <!-- <p class="card-category d-inline "><span class="badge badge-info">sents:  {{totalsents}} </span></p>
@@ -37,12 +37,12 @@
             <i class="fa fa-trash"  ></i> Delete this language
           </button>
           <hr/>
-          <button class="dropdown-item"  (click)="train()" >
+          <button class="dropdown-item"  (click)="train()"  *ngIf="!isTraining">
             <i class="tim-icons icon-molecule-40"  ></i> Train auto-tagger
           </button>
         </div>
       </div>
-      <button type="button" class="btn btn-link  btn-icon show"  (click)="language.isExpanded=!language.isExpanded">
+      <button type="button" class="btn btn-link  btn-icon show"  (click)="togglePanel()">
         <i class="fa"  [ngClass]="{'fa-chevron-up':!language.isExpanded,'fa-chevron-down':!!language.isExpanded}"></i>
       </button>
   </div>
@@ -75,6 +75,11 @@
                       Lemmas
                     </div>
                   </th>
+                  <th class="text-right"  >
+                    <div class="tablesorter-header-inner">
+                    POS TAGS
+                    </div>
+                  </th>
                   <th></th>
                   </thead>
                 <tbody>
@@ -85,7 +90,7 @@
                       </div>
                     </td>
                     <td class="text-right">
-                      {{fl.totalsents}} 
+                      {{fl.totalsentences}} 
                     </td>
                     <td class="text-right">
                       {{fl.totalWords}} 
@@ -93,10 +98,13 @@
                     <td class="text-right">
                       {{fl.totalLemmas}} 
                     </td>
+                    <td class="text-right">
+                      {{fl.totalUpostags}} 
+                    </td>
                     <td>
                       <div >
                         <div class="dropdown pull-right" >
-                          <button type="button" class="btn btn-link  btn-icon" [routerLink]="['/detail',language.languageName,fl.fileName,1]" routerLinkActive="router-link-active"   title="details">
+                          <button type="button" class="btn btn-link  btn-icon" [routerLink]="['/detail',language.languageName,fl.guid,1]" routerLinkActive="router-link-active"   title="details">
                             <i class="fa fa-pencil"  ></i>
                           </button>
                           <button type="button" class="btn btn-link  btn-icon"   title="delete this file" (click)="deletefile(fl)">
@@ -126,7 +134,7 @@
       </app-modal-popup>
 
       <app-modal-popup *ngIf="showMoveFileDialog"  (close)="cancelMoveFile()" (save)="confirmMovefile()">
-        <span slot="title">Select Language</span>
+        <span slot="title">Select destination Language</span>
         <div slot="body">
           <div class="card">
             <div class="card-body">

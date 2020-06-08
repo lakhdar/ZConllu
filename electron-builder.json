@@ -1,8 +1,6 @@
 {
   "productName": "zConllu",
-  "directories": {
-    "output": "release/"
-  },
+ 
     "files": [
         "**/*",
         "!**/*.ts",
@@ -20,21 +18,33 @@
         "!tslint.json"
     ],
   "win": {
-    "icon": "dist/assets/icons",
+    "icon": "dist/zConllu/assets/icons",
     "target": [
-      "portable"
+      "nsis","msi"
     ]
   },
   "mac": {
-    "icon": "dist/assets/icons",
+    "icon": "dist/zConllu/assets/icons",
     "target": [
       "dmg"
     ]
   },
   "linux": {
-    "icon": "dist/assets/icons",
+    "icon": "dist/zConllu/assets/icons",
     "target": [
       "AppImage"
+    ]
+  },
+  "build": {
+    "nsis": {
+      "createStartMenuShortcut": true 
+    } ,
+    "directories": {
+      "output": "release/",
+      "buildResources": "res"
+    },
+    "extraFiles": [
+      "res/**"
     ]
   }
 }

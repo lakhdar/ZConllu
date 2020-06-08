@@ -13,13 +13,13 @@
       <button type="button" rel="tooltip" class="btn btn-success btn-link btn-sm btn-icon " data-original-title="Refresh" title="Add new line" (click)="addLine()" >
         <i class="tim-icons icon-simple-add"></i>
       </button>
-      <button type="button" class="btn btn-link  btn-icon"  (click)="sent.isExpnaded=!sent.isExpnaded" title="Expande/collapse">
-        <i class="fa"  [ngClass]="{'fa-chevron-up':!sent.isExpnaded,'fa-chevron-down':!!sent.isExpnaded}"></i>
+      <button type="button" class="btn btn-link  btn-icon"  (click)="togglePanel()" title="Expande/collapse">
+        <i class="fa"  [ngClass]="{'fa-chevron-up':!sent.isExpanded,'fa-chevron-down':!!sent.isExpanded}"></i>
       </button>
     </div>
     <label id="email-error" class="error" for="langName" *ngIf="errorMsg" style="color: red;" (click)="errorMsg=''">{{errorMsg}}</label>
   </div>
-  <div class="card-body" *ngIf='sent.isExpnaded'>
+  <div class="card-body" *ngIf='sent.isExpanded'>
        
 
     <div class="table-responsive ps">
@@ -28,7 +28,7 @@
           <tr role="row" class="tablesorter-headerRow">
             <th data-column="0" class="tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" aria-controls="simple-table" unselectable="on" aria-sort="none" aria-label="Name: No sort applied, activate to apply an ascending sort" style="user-select: none;">
                       <div class="tablesorter-header-inner">
-                      Index
+                      ID
                     </div>
                     <th data-column="0" class="text-left"   style="user-select: none;">
                       <div class="tablesorter-header-inner">
@@ -90,25 +90,25 @@
               {{line.lemma}}
             </td>
             <td class="text-left ellipsis" style="max-width: 100px;;" title="{{line.POS}}">
-              {{line.POS}}
+              {{line.POS||'_'}}
             </td>
             <td class="text-left ellipsis" style="max-width: 100px;;" title="{{line.XPOS}}">
-              {{line.XPOS}}
+              {{line.XPOS||'_'}}
             </td>
             <td class="text-left ellipsis" style="max-width: 100px;;" title="{{line.FEATS}}">
-              {{line.FEATS}}
+              {{line.FEATS||'_'}}
             </td>
             <td class="text-right  ellipsis" style="max-width: 100px;;" title="{{line.HEAD}}">
-              {{line.HEAD}}
+              {{line.HEAD||'_'}}
             </td>
             <td class="text-center  ellipsis" style="max-width: 100px;;" title="{{line.DEPREL}}">
-              {{line.DEPREL}}
+              {{line.DEPREL||'_'}}
             </td>
             <td class="text-center">
-              {{line.DEPS}}
+              {{line.DEPS||'_'}}
             </td>
             <td class="text-left  ellipsis" style="max-width: 120px;;" title="{{line.MISC}}">
-              {{line.MISC}}
+              {{line.MISC||'_'}}
             </td>
             
             <td>
@@ -149,7 +149,7 @@
             </div>
           </div>
         </div>
-
+ 
         <div class="row">
           <label class="col-sm-2 col-form-label">FORM *</label>
           <div class="col-sm-10">
@@ -212,7 +212,7 @@
             <div class="card-header dropdown " [ngClass]="{'show':currentLine.isFEATExpanded}" style="padding:0;padding-right: 12px;">
               <i class="fa fa-cog pull-right  text-warning"  
                  [ngClass]="{'loading-spinner': !currentLine.isFEATExpanded}"
-                (click)="currentLine.isFEATExpanded=!currentLine.isFEATExpanded" 
+                (click)="toggleFeatsPanel()" 
                 title="Add/Remove FEATS"
                 style="cursor: pointer;"></i>
               <div class="dropdown-menu dropdown-menu-right show" *ngIf='currentLine.isFEATExpanded'  x-placement="top-end" style="position: absolute; transform: translate3d(-122px, -186px, 0px) ; top: 0px ; left: 0px ; will-change: transform;max-height:350px;overflow: auto;" x-out-of-boundaries="">
@@ -239,7 +239,7 @@
           <label class="col-sm-2 col-form-label">HEAD</label>
           <div class="col-sm-10">
             <div class="form-group">
-              <input class="form-control" type="text" name="HEAD"   required="" [(ngModel)]="currentLine.HEAD">
+              <input class="form-control" type="number" name="HEAD"   required="" [(ngModel)]="currentLine.HEAD">
             </div>
           </div>
         </div>
@@ -269,7 +269,7 @@
             </div>
           </div>
         </div>
-        <label id="email-error" class="error" for="langName" *ngIf="errorMsg" style="color: red;" (click)="errorMsg=''">{{errorMsg}}</label>
+        <label  class="error"  *ngIf="errorMsg" style="color: red;font-size: 14px;" (click)="errorMsg=''">{{errorMsg}}</label>
       </div>
     </div>
   </div>

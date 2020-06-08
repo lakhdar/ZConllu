@@ -1,6 +1,6 @@
  <div class="main-panel ps ps--active-y" data="blue">
   <app-nav>
-       <a class="navbar-brand " href="javascript:void(0)" slot="title" >{{langname}}<b> / </b>{{filename}} </a>
+       <a class="navbar-brand " href="javascript:void(0)" slot="title" >{{langname}}<b> / </b>{{document.fileName}} </a>
        <a class=" btn btn-primary" href="javascript:void(0)" slot="tools" [routerLink]="['/home']">Back to files</a>
        <a class=" btn btn-success" href="javascript:void(0)" slot="tools" (click)="addSentence()">Add a sentence </a>
   </app-nav>
@@ -9,14 +9,14 @@
   <app-alert [message]="errorMsg"></app-alert>
    <div class="row">
      
-     <div class="col-md-12" *ngIf="file">
-      <app-sent-panel  *ngFor="let sent of file.sentences" [sent]="sent"     [langName]="langname" [fileName]="filename" [currentPage]="currentPage"
+     <div class="col-md-12" *ngIf="document">
+      <app-sent-panel  *ngFor="let sent of document.sentences" [sent]="sent"     [langName]="langname" [fileName]="document.fileName" [currentPage]="currentPage"
        (deleteSent)="deletesent(sent)"
        (editSent)="editSentece(sent)"
         >
       </app-sent-panel>
      </div>
-     <div class="col-md-12" *ngIf="!file.sentences.length">
+     <div class="col-md-12" *ngIf="!document.sentences.length">
           This file is empty
       </div>
    </div>
@@ -57,11 +57,33 @@
   </div>
 </app-modal-popup>
 <app-modal-popup *ngIf="showEditSenteceDialog"  (close)="cancelEditSentece()" (save)="confirmEditSentece()">
-  <span slot="title">Edit sentence</span>
+  <span slot="title">{{bForAdd?'Create a new':'Edit'}} sentence</span>
   <div slot="body">
     <div class="card">
-      <div class="card-body">
-        <div class="row">
+      <div class="card-body" >
+
+        <div class="row"  >
+          <div class="card" style="margin-bottom: unset;height: 20px;">
+            <div class="card-header dropdown "  [ngClass]="{show: showAddTranslationDropDown}" style="padding:0;padding-right: 12px;">
+              <i class="fa fa-cog pull-right  text-warning loading-spinner" 
+               (click) ="showAddTranslationDropDown=!showAddTranslationDropDown"
+                title="Add translation"
+                style="cursor: pointer;"></i>
+              <div class="dropdown-menu dropdown-menu-right show"   x-placement="top-end" style="position: absolute; transform: translate3d(-122px, -186px, 0px) ; top: 0px ; left: 0px ; will-change: transform;max-height:350px;overflow: auto;" x-out-of-boundaries="">
+                <button class="dropdown-item" title=""   *ngFor="let lng of translationLanguages"  (click)="addTranslation(lng)">
+                  <i class="fa text-success"  ></i> 
+                   translate to <b style="text-transform: uppercase;">{{lng}}</b>
+                </button>
+              </div>
+            </div>
+            <div class="card-body row">
+               
+            </div>
+          </div>
+         </div>
+
+
+        <div class="row" *ngIf="!bForAdd">
           <label class="col-sm-3 col-form-label">Sent id *</label>
           <div class="col-sm-9">
             <div class="form-group">
@@ -74,7 +96,16 @@
           <label class="col-sm-2 col-form-label">Text *</label>
           <div class="col-sm-10">
             <div class="form-group">
-              <textarea class="form-control" [(ngModel)]="currentSentence.text" rows="5" cols="60"></textarea>
+              <textarea class="form-control" [(ngModel)]="currentSentence.text" rows="20" cols="60" style="height: 200px;max-height: 500px !important;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" *ngFor="let trans of currentSentence.translations">
+          <label class="col-sm-3 col-form-label" style="text-transform: capitalize;">{{trans.language}}</label>
+          <div class="col-sm-9">
+            <div class="form-group">
+              <input class="form-control" type="text" name="sentId"   required="" [(ngModel)]="trans.text">
             </div>
           </div>
         </div>

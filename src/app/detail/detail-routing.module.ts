@@ -5,7 +5,7 @@ import { DetailComponent } from './detail.component';
 
 const routes: Routes = [
   {
-    path: 'detail/:langname/:filename/:page',
+    path: 'detail/:langname/:guid/:page',
     component: DetailComponent
   }
 ];

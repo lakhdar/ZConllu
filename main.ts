@@ -22,7 +22,7 @@ function createWindow(): BrowserWindow {
       allowRunningInsecureContent: (serve) ? true : false,
     },
   });
-
+  win.setMenuBarVisibility(false);
   if (serve) {
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`)
@@ -30,14 +30,14 @@ function createWindow(): BrowserWindow {
     win.loadURL('http://localhost:4200');
   } else {
     win.loadURL(url.format({
-      pathname: path.join(__dirname, 'dist/index.html'),
+      pathname: path.join(__dirname, 'dist/zConllu/index.html'),
       protocol: 'file:',
       slashes: true
     }));
   }
-
+  win.webContents.openDevTools();
   if (serve) {
-    win.webContents.openDevTools();
+    
   }
 
   // Emitted when the window is closed.
@@ -53,7 +53,7 @@ function createWindow(): BrowserWindow {
 
 try {
 
-  app.allowRendererProcessReuse = true;
+  app.allowRendererProcessReuse = false;
 
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.

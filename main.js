@@ -19,6 +19,7 @@ function createWindow() {
             allowRunningInsecureContent: (serve) ? true : false,
         },
     });
+    win.setMenuBarVisibility(false);
     if (serve) {
         require('electron-reload')(__dirname, {
             electron: require(__dirname + "/node_modules/electron")
@@ -27,13 +28,13 @@ function createWindow() {
     }
     else {
         win.loadURL(url.format({
-            pathname: path.join(__dirname, 'dist/index.html'),
+            pathname: path.join(__dirname, 'dist/zConllu/index.html'),
             protocol: 'file:',
             slashes: true
         }));
     }
+    win.webContents.openDevTools();
     if (serve) {
-        win.webContents.openDevTools();
     }
     // Emitted when the window is closed.
     win.on('closed', function () {
@@ -45,7 +46,7 @@ function createWindow() {
     return win;
 }
 try {
-    electron_1.app.allowRendererProcessReuse = true;
+    electron_1.app.allowRendererProcessReuse = false;
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.

@@ -1,9 +1,13 @@
 import { Component,Input ,OnInit,Output ,EventEmitter,ElementRef, ViewChild} from '@angular/core';
 import { ConlluLanguageModel } from '../../../model/conllu-language-model';
-import { ConlluDataService } from '../../../services/conllu-data-service';
+
+import { ElectronHelperService } from '../../../services/electron-helper-service';
+
 import { ConlluModel } from '../../../model/conllu-model';
 import { TrainModel } from '../../../model/train-model';
 
+import { DocumentManagementService } from '../../../../management/document-management-service';
+import { LanguageManagementService } from '../../../../management/language-management-service';
 
 @Component({
   selector: 'app-language-panel',
@@ -11,11 +15,21 @@ import { TrainModel } from '../../../model/train-model';
   styleUrls: ['./language-panel.component.scss']
 })
 export class LanguagePanelComponent implements OnInit {
-  constructor(public service: ConlluDataService) {}
-  @Input()language:ConlluLanguageModel;
-  @Input()languages:ConlluLanguageModel[];
+  constructor(
+     public documentService:DocumentManagementService,
+     public electronservice:ElectronHelperService,
+     public languageservice:LanguageManagementService,
+     
+     ) {}
+  @Input() language:ConlluLanguageModel;
+  @Input() languages:ConlluLanguageModel[];
+  @Input() isTraining:boolean;
+
   @ViewChild('input1') inputEl:ElementRef;
+
   @Output() deleteLanguage = new EventEmitter();
+  @Output() updateLanguage = new EventEmitter();
+
   oldValue:string;
   errorMsg:string="";
   toggleMenu:boolean;
@@ -51,97 +65,112 @@ export class LanguagePanelComponent implements OnInit {
       }
   }
 
- 
-
-
-
-
-
-
-
-
-
-
-
-
-  renamelanguage(){
-    this.errorMsg="";
-    this.language.isPrestine=false;
-    try{
-      this.service.renameLanguage(this.language,this.oldValue).subscribe(()=>{
-        this.oldValue=this.language.languageName;
-      });
-    }catch(er){
-      console.error(er)
-      this.errorMsg=er;
-      this.language.languageName=this.oldValue;
-    }
-  }
 
   OndeleteLanguage(){
     this.toggleMenu=false;
     this.deleteLanguage.emit();
   }
-  
+  OnUpdateLanguage(){
+    this.toggleMenu=false;
+    this.updateLanguage.emit();
+  }
+
+
+
+  togglePanel(){
+   
+    this.language.isExpanded=!this.language.isExpanded;
+    if(this.language.isExpanded){
+
+// let sptah="C:\\Users\\lakhd\\source\\repos\\PythonApplication1\\text_parser\\corpus.txt";
+// this.documentService.importeTextFile(sptah,this.language.languageName,"corpus",	-2036688370).then(()=>{
+// console.log("final")
+// })
+
+
+      this.documentService.get(this.language.languageName).then((files)=>{
+        this.language.conlluFiles=(files||[]).map(item=>new ConlluModel(item));
+        this.showSpinner=false;
+
+            setTimeout(() => {
+                this.documentService.getCounts(files,this.language.languageName,0,[]).then((newFiles)=>{
+                    this.language.conlluFiles=(newFiles||[]).map(item=>new ConlluModel(item));
+                }).catch(er=>this._showError(er,"getCounts"));
+            
+            }, 10);
+      }).catch(er=>this._showError(er,"togglePanel"));
+    }
+  }
+
+
 
   importfile(){
     this.errorMsg="";
+    //this.language.isExpanded=false;
+    this.toggleMenu=false;
     this.showSpinner=true;
     try{
-      this.toggleMenu=false;
-      this.language.isExpanded=false;
-      this.service.importFile(this.language)
-        .then(()=>{
-          this.language.isExpanded=true;
-          this.showSpinner=false;
-        }).catch(er=>{
-          console.error(er)
-          this.errorMsg=er;
-          this.showSpinner=false;
-        });
+        this.electronservice.openfileDialog() .then( (files)=> {
+            if (files &&files.filePaths) {
+              let fl=files.filePaths[0];
+              if(fl) {
+                  this.documentService.importConlluFileStream(fl,this.language.guid,this.language.languageName).then((doc)=>{
+                    this.language.isExpanded=false;
+                      setTimeout(() => {
+                        this.togglePanel();
+                      }, 50);
+                  }).catch(er=>this._showError(er));
+                }else{
+                  this.showSpinner=false;
+                }
+            }
+        }).catch(er=>this._showError(er));
     }catch(er){
-      console.error(er)
-      this.errorMsg=er;
-      this.showSpinner=false;
+      this._showError(er);
     }
   }
+
+
+
+
+
   importUdpefile(){
     this.errorMsg="";
     this.showSpinner=true;
-    try{
-      this.toggleMenu=false;
-      this.language.isExpanded=false;
-      this.service.importUdpeFile(this.language)
-        .then((obs)=>{
-           
-          this.language.isExpanded=true;
-          this.showSpinner=false;
-          if(obs&&obs.subscribe){
-            obs.subscribe(lang=>{
-              this.language.udpeFile=lang.udpeFile;
-            })
-           }
-        }).catch(er=>{
-          console.error(er)
-          this.errorMsg=er;
-          this.showSpinner=false;
-        });
-    }catch(er){
-      console.error(er)
-      this.errorMsg=er;
-      this.showSpinner=false;
-    }
+    this.language.isExpanded=false;
+    this.toggleMenu=false;
+      try{
+       
+        this.electronservice.openfileDialog(" trained .udpipe file","udpipe") .then( (files)=> {
+            if (files &&files.filePaths) {
+              let fl=files.filePaths[0];
+              if(fl) {
+                let lang=this.language.getLanguage()
+                  this.documentService.importUDpipeFile(fl,lang).then((lng)=>{
+                    this.language.udpeFile=lng.udpFile;
+                    this.showSpinner=false;
+                    this.language.isExpanded=true;
+                  }).catch(er=>this._showError(er))
+                }
+            }
+        }).catch(er=>this._showError(er));
+      }catch(er){
+        this._showError(er);
+      }
   }
 
 
   createFile(){
-    this.currentFile=new ConlluModel("");
+    this.currentFile=new ConlluModel(null);
+    this.currentFile.languageId=this.language.guid;
     this.showCreateFileDialog=true;
     this.toggleMenu=false;
+    if(!this.language.isExpanded)this.togglePanel();
   }
   cancelCreateFile(){
     this.currentFile=undefined;
     this.showCreateFileDialog=false;
+    this.errorMsg="";
   }
   confirmCreatefile(){
     this.errorMsg="";
@@ -149,38 +178,24 @@ export class LanguagePanelComponent implements OnInit {
       this.errorMsg="File name is required";
       return;
     }
-
-    try{
-      this.language.isExpanded=false;
-      this.service.createNewFile(this.language,this.currentFile).subscribe(lang=>{
-        this.currentFile=undefined;
-        this.showCreateFileDialog=false;
-        this.language.isExpanded=true;
-        for(let fle of lang.conlluFiles){
-          if(this.language.conlluFiles.findIndex(x=>x.fileName==fle.fileName)<0){
-            this.language.conlluFiles.push(fle);
-          }
-        }
-      })
-    }catch(er){
-      this.errorMsg=er;
-      console.error(er);
-    }
-    
-  }
-
-  toggleEditInput(){
-    this.language.isPrestine=!this.language.isPrestine;
-    if(this.language.isPrestine)
-        setTimeout(() => this.inputEl.nativeElement.focus());
-  }
-
-
-  
-
-
-
  
+    try{
+      this.errorMsg="";
+      this.showSpinner=true;
+      let file=this.currentFile.getDocument();
+      this.documentService.create(file,this.language.languageName).then(()=>{
+        this.language.isExpanded=false;
+          setTimeout(() => {
+            this.togglePanel();
+            this.currentFile=undefined;
+            this.showCreateFileDialog=false;
+        }, 20);
+      }).catch(er=>this._showError(er,"Createfile"));
+    }catch(er){
+      this._showError(er);
+    }
+  }
+
 
   deletefile(selectedFile:ConlluModel){
     this.currentFile=selectedFile;
@@ -196,22 +211,21 @@ export class LanguagePanelComponent implements OnInit {
   confirmDeletefile(){
     this.errorMsg="";
     this.showSpinner=true;
+    this.language.isExpanded=false;
+    let file=this.currentFile.getDocument();
     try{
-      this.service.deleteFile(this.language,this.currentFile.fileName).subscribe(arg=>{
-        this._updateFiles(arg);
-        this.currentFile=undefined;
-        this.showDeleteFileDialog=false;
-        this.showSpinner=false;
-      })
+      this.documentService.delete(file,this.language.languageName).then(arg=>{
+        setTimeout(() => {
+          this.togglePanel();
+          this.currentFile=undefined;
+          this.showDeleteFileDialog=false;
+          this.showSpinner=false;
+      }, 20);
+      }).catch(er=>this._showError(er,"delete"));
     }catch(er){
-      console.error(er)
-      this.errorMsg=er;
-      this.showSpinner=false;
+      this._showError(er);
     }
   }
-
-
-
 
 
   moveFile(selectedFile:ConlluModel){
@@ -237,28 +251,20 @@ export class LanguagePanelComponent implements OnInit {
       return;
     }
     try{
-      this.service.moveFile(this.currentFile,this.language,this.destinationLanguage).subscribe((args)=>{
-          for(let lang of args||[]){
-            if(lang.languageName==this.language.languageName){
-                for(let fle of lang.conlluFiles){
-                  let idx=this.language.conlluFiles.findIndex(x=>x.fileName==this.currentFile.fileName);
-                  if(idx>=0){
-                    this.language.conlluFiles.splice(idx,1);
-                  }
-                }
-            }
-          }
+      this.language.isExpanded=true;
+      let file=this.currentFile.getDocument();
+      this.documentService.moveConlluFile(file,this.language.languageName,this.destinationLanguage.languageName,this.destinationLanguage.guid).then(()=>{
           this.destinationLanguage.conlluFiles.push(this.currentFile);
+          this.destinationLanguage.isExpanded=true;;
           this.currentFile=undefined;
           this.showMoveFileDialog=false;
           this.showSpinner=false;
           this.language.isExpanded=false;
           this.destinationLanguage.isExpanded=true;
-      })
+      }).catch(er=>this._showError(er,"Movefile"));
+      
     }catch(er){
-      console.error(er);
-      this.errorMsg=er;
-      this.showSpinner=false;
+      this._showError(er);
     }
 }
 
@@ -273,34 +279,24 @@ cancelTrainFile(){
 confirmTrainfile(){
   this.errorMsg="";
     try{
-      this.service.trainUDPipeAutoTagger(this.trainModel)
-      .then(()=>{
+      this.languageservice.trainUDPipeAutoTagger(this.trainModel)
+      .then(()=>{ 
         this.showTrainDialog=false;
       }).catch((er)=>{
+        console.error("trainUError",er);
         this.errorMsg=er;
       }) 
     }catch(er){
+      console.error("confirmTrainfile",er);
       this.errorMsg=er;
     }
-    
 }
 
-
-  _updateFiles(lang:ConlluLanguageModel){
-    
-    for(let ob of lang.conlluFiles){
-      if(this.language.conlluFiles.findIndex(x => x.fileName=== ob.fileName)<0){
-          this.language.conlluFiles.push(ob);
-      }
-    }
-  
-    for(let i=0;i<this.language.conlluFiles.length;i++){
-      let lng=this.language.conlluFiles[i].fileName;
-      if(lang.conlluFiles.findIndex(x => x.fileName === lng)<0){
-          this.language.conlluFiles.splice(i,1);
-      }
-    }
-  }
-
+   
+  _showError(er,action?:string){
+    console.error(er)
+    this.errorMsg=er;
+    this.showSpinner=false;
+   }
 
 }
